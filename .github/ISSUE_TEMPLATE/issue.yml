@@ -1,0 +1,22 @@
+name: General Issue
+description: General issue or feedback
+title: "[Issue]: "
+labels: []
+assignees: []
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Please describe the issue in detail.
+      placeholder: Describe the problem, bug, or feedback here.
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Screenshot
+      description: You can attach a screenshot to help illustrate the issue.
+      placeholder: Drag and drop or paste your screenshot here (optional).
