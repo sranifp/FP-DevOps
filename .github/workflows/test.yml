@@ -1,10 +1,69 @@
 name: run-test-cases
 
 on:
-  push: 
-    branches: ["*"]
+  push:
+    branches:
+      - "*"             # trigger saat push di branch issue otomatis
   pull_request:
-    branches: ["*"]
+    branches:
+      - "*"        # trigger saat PR ke development
 
 jobs:
-  
+  test:
+    name: Run Go Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20' # Ganti sesuai dengan versi Go kamu
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          until pg_isready -h localhost -p 5432; do
+            sleep 1
+          done
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Build application
+        run: go build ./...
+
+      - name: Run tests
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: test_db
+        run: go test -v -cover ./...
