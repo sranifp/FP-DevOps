@@ -44,6 +44,7 @@ jobs:
           DB_USER: postgres
           DB_PASSWORD: postgres
           DB_NAME: test_db
+          APP_ENV: production
         working-directory: ./app
         run: go test -v -cover ./...
 
