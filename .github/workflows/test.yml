@@ -1,12 +1,6 @@
 name: run-test-cases
 
-on:
-  push:
-    branches:
-      - "*"             # trigger saat push di branch issue otomatis
-  pull_request:
-    branches:
-      - "*"        # trigger saat PR ke development
+on: [push, pull_request]
 
 jobs:
   test:
